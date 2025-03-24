@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
 import { mapExperimentFileNameToUrl } from "./helpers/string-helpers.tsx";
+import ExperimentCard from "./components/ExperimentCard.tsx";
 
 const experimentModules = import.meta.glob("./pages/experiments/**/*.tsx");
 
@@ -16,11 +16,9 @@ const App = () => {
   }, []);
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {experiments.map((exp) => (
-        <Link key={exp} to={`/${exp}`}>
-          {exp}
-        </Link>
+        <ExperimentCard exp={exp} />
       ))}
     </div>
   );

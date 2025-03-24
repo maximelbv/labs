@@ -1,3 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Jersey+10&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
+
 @import "tailwindcss";
 
 @theme {
@@ -5,9 +9,16 @@
   --color-elem-background: #e9eaf6;
   --color-text-primary: #363636;
   --color-text-muted: #7b8093;
+  --color-text-muted-light: #abb4d1;
   --color-border-default: #cdd6e0;
+  --color-border-light: #dce7f2;
+
+  --font-bricolage: "Bricolage Grotesque", "Plus Jakarta Sans", "Inter",
+    sans-serif;
+  --font-jetbrains: "JetBrains Mono", serif;
+  --font-jersey: "Jersey 10", sans-serif;
 }
 
 body {
-  @apply bg-background;
+  @apply bg-background font-bricolage;
 }

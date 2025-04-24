@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { mapExperimentFileNameToUrl } from "./helpers/string-helpers.tsx";
 import ExperimentCard from "./components/ExperimentCard.tsx";
 
-const experimentModules = import.meta.glob("./pages/experiments/**/*.tsx");
+const experimentModules = import.meta.glob(
+  "./pages/experiments/**/*.{tsx,jsx}"
+);
 
 const App = () => {
   const [experiments, setExperiments] = useState<string[]>([]);

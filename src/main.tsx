@@ -8,7 +8,7 @@ import { lazy, Suspense, ComponentType } from "react";
 import { mapExperimentFileNameToUrl } from "./helpers/string-helpers.tsx";
 
 const experimentModules = import.meta.glob(
-  "./pages/experiments/**/*.tsx"
+  "./pages/experiments/**/*.{tsx,jsx}"
 ) as Record<string, () => Promise<{ default: ComponentType<unknown> }>>;
 
 const preloadExperiments = () => {

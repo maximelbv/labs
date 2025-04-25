@@ -1,4 +1,3 @@
-import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "./globals.css";
 import App from "./App.tsx";
@@ -11,9 +10,9 @@ const experimentModules = import.meta.glob(
   "./pages/experiments/**/*.{tsx,jsx}"
 ) as Record<string, () => Promise<{ default: ComponentType<unknown> }>>;
 
-const preloadExperiments = () => {
-  Object.values(experimentModules).forEach((importModule) => importModule());
-};
+// const preloadExperiments = () => {
+//   Object.values(experimentModules).forEach((importModule) => importModule());
+// };
 
 const generateExperimentRoutes = () => {
   return Object.entries(experimentModules).map(([path, importModule]) => {
@@ -36,9 +35,9 @@ const generateExperimentRoutes = () => {
 };
 
 const RootApp = () => {
-  useEffect(() => {
-    preloadExperiments();
-  }, []);
+  // useEffect(() => {
+  //   preloadExperiments();
+  // }, []);
 
   return (
     <BrowserRouter>
@@ -58,7 +57,8 @@ const RootApp = () => {
 };
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <RootApp />
-  </StrictMode>
+  // Le strict mode commenté car il monte/démonte 2 fois, ce qui fait beuguer le moteur physique
+  // <StrictMode>
+  <RootApp />
+  // </StrictMode>
 );

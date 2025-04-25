@@ -1,24 +1,34 @@
 import { OrbitControls, useHelper } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
+import { Leva, useControls } from "leva";
 import { useState } from "react";
 import { useRef } from "react";
 import { DirectionalLightHelper } from "three";
 
 const Light = () => {
+  const { lightColor, lightIntensity } = useControls({
+    lightColor: "white",
+    lightIntensity: {
+      value: 1,
+      min: 0,
+      max: 5,
+    },
+  });
   const directionalLightRef = useRef(null);
-
   useHelper(directionalLightRef, DirectionalLightHelper);
+
   return (
     <>
       <ambientLight intensity={1} />
       <directionalLight
+        color={lightColor}
         ref={directionalLightRef}
-        intensity={1}
+        intensity={lightIntensity}
         angle={0.2}
         penumbra={1}
         position={[1, 1, 1]}
         castShadow
-        shadow-mapSize={[256, 256]}
+        // shadow-mapSize={[256, 256]}
       />
     </>
   );
@@ -78,15 +88,24 @@ const Sphere = ({ position, color, hoveredColor, args }) => {
   );
 };
 
-const CrossClump = () => {
+const Plane = ({ position, args, color }) => {
   return (
-    <div className="w-full h-[100svh]">
+    <mesh position={position}>
+      <planeGeometry args={args} />
+      <meshStandardMaterial color={color} />
+    </mesh>
+  );
+};
+
+const Basics = () => {
+  return (
+    <>
+      <Leva />
       <Canvas
-        className="!min-h-[100svh] flex items-center justify-center [&>canvas]:!w-full [&>canvas]:!h-full "
         gl={{ antialias: true }}
-        camera={{ position: [2, 0, 2], fov: 100, near: 1, far: 40 }}
+        camera={{ position: [4, 0, 2], fov: 100, near: 1, far: 40 }}
       >
-        <color attach="background" args={["#2f2f2f"]} />
+        <color attach="background" args={["#242424"]} />
         <Light />
         <Sphere
           position={[0, 0, 0]}
@@ -94,10 +113,11 @@ const CrossClump = () => {
           color={"orange"}
           hoveredColor={"blue"}
         />
+
         <OrbitControls />
       </Canvas>
-    </div>
+    </>
   );
 };
 
-export default CrossClump;
+export default Basics;

@@ -20,7 +20,7 @@ const App = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {experiments.map((exp) => (
-        <ExperimentCard exp={exp} />
+        <ExperimentCard exp={exp} key={exp} />
       ))}
     </div>
   );

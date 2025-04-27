@@ -169,12 +169,15 @@ const Pointer = () => {
 
 const Scene = ({
   modelConfigs = [
-    { url: "/models/test.glb", scale: 0.7 },
-    { url: "/models/dragon.glb", scale: 2 },
-    { url: "/models/frog.glb", scale: 8 },
+    { url: "/models/brainrot/ambalabu.glb", scale: 1 },
+    { url: "/models/brainrot/bananini.glb", scale: 1 },
+    { url: "/models/brainrot/bombardiro.glb", scale: 0.5 },
+    { url: "/models/brainrot/patapim.glb", scale: 0.1 },
+    { url: "/models/brainrot/sahur.glb", scale: 0.2 },
+    { url: "/models/brainrot/tralala.glb", scale: 0.2 },
   ],
   instanceCount = 40,
-  backgroundColor = "black",
+  backgroundColor = "#f1f1f1",
   hdriUrl = "/hdri/photostudio.exr",
   hdriIntensity = 0.4,
 }) => {
@@ -188,7 +191,7 @@ const Scene = ({
 
   return (
     <Canvas
-      style={{ cursor: "none", background: backgroundColor }}
+      style={{ cursor: "none" }}
       camera={{ position: [0, 0, 30], fov: 35 }}
       shadows
     >
@@ -202,12 +205,16 @@ const Scene = ({
         shadow-bias={-0.0001}
       />
       {hdriUrl && (
-        <Environment files={hdriUrl} environmentIntensity={hdriIntensity} />
+        <Environment
+          background={false}
+          files={hdriUrl}
+          environmentIntensity={hdriIntensity}
+        />
       )}
-      <EffectComposer multisampling={0}>
+      <EffectComposer multisampling={0} renderPriority={1} autoClear={false}>
         <N8AO
           halfRes
-          color="black"
+          color={backgroundColor}
           aoRadius={2}
           intensity={1}
           aoSamples={6}

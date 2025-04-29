@@ -7,15 +7,28 @@ import {
 } from "@react-three/rapier";
 import { useEffect, useMemo, useRef } from "react";
 import { Environment, Sphere, useGLTF, Clone } from "@react-three/drei";
-import { MathUtils, Vector3 } from "three";
+import { MathUtils, Mesh, Vector3 } from "three";
 import { EffectComposer, N8AO } from "@react-three/postprocessing";
+import type { Vector3Tuple } from "three";
 
-const ModelInstance = ({ url, position, rotation, scale }) => {
+type ModelInstanceProps = {
+  url: string;
+  position: Vector3Tuple;
+  rotation: Vector3Tuple;
+  scale: Vector3Tuple;
+};
+
+const ModelInstance = ({
+  url,
+  position,
+  rotation,
+  scale,
+}: ModelInstanceProps) => {
   const { scene } = useGLTF(url);
 
   useEffect(() => {
     scene.traverse((child) => {
-      if (child.isMesh) {
+      if (child instanceof Mesh) {
         child.castShadow = true;
         child.receiveShadow = true;
       }
@@ -32,8 +45,20 @@ const ModelInstance = ({ url, position, rotation, scale }) => {
   );
 };
 
-const ModelRigidBody = ({ url, position, rotation, scale }) => {
-  const ref = useRef<RapierRigidBody>(null);
+type ModelRigidBodyProps = {
+  url: string;
+  position: Vector3Tuple;
+  rotation: Vector3Tuple;
+  scale: Vector3Tuple;
+};
+
+const ModelRigidBody = ({
+  url,
+  position,
+  rotation,
+  scale,
+}: ModelRigidBodyProps) => {
+  const ref = useRef<RapierRigidBody | null>(null);
 
   useFrame(() => {
     if (!ref.current) return;
@@ -64,7 +89,17 @@ const ModelRigidBody = ({ url, position, rotation, scale }) => {
   );
 };
 
-const Clump = ({ modelConfigs = [], count = 40 }) => {
+type ModelConfig = {
+  url: string;
+  scale: number | Vector3Tuple;
+};
+
+type ClumpProps = {
+  modelConfigs: ModelConfig[];
+  count: number;
+};
+
+const Clump = ({ modelConfigs = [], count = 40 }: ClumpProps) => {
   const instances = useMemo(() => {
     return Array.from({ length: count }, () => {
       const config =
@@ -73,17 +108,17 @@ const Clump = ({ modelConfigs = [], count = 40 }) => {
         modelUrl: config.url,
         scale: Array.isArray(config.scale)
           ? config.scale
-          : [config.scale, config.scale, config.scale],
+          : ([config.scale, config.scale, config.scale] as Vector3Tuple),
         position: [
           MathUtils.randFloatSpread(1),
           MathUtils.randFloatSpread(1),
           MathUtils.randFloatSpread(1),
-        ],
+        ] as Vector3Tuple,
         rotation: [
           Math.random() * Math.PI * 2,
           Math.random() * Math.PI * 2,
           Math.random() * Math.PI * 2,
-        ],
+        ] as Vector3Tuple,
       };
     });
   }, [count, modelConfigs]);
@@ -130,7 +165,7 @@ const Clump = ({ modelConfigs = [], count = 40 }) => {
 
 const Pointer = () => {
   const { viewport } = useThree();
-  const ref = useRef<RapierRigidBody>(null);
+  const ref = useRef<RapierRigidBody | null>(null);
   const ready = useRef(false);
 
   useEffect(() => {
@@ -167,20 +202,32 @@ const Pointer = () => {
   );
 };
 
+type SceneProps = {
+  modelConfigs?: ModelConfig[];
+  instanceCount?: number;
+  backgroundColor?: string;
+  hdriUrl?: string;
+  hdriIntensity?: number;
+};
+
 const Scene = ({
+  // modelConfigs = [
+  //   { url: "/models/brainrot/ambalabu.glb", scale: 1 },
+  //   { url: "/models/brainrot/bananini.glb", scale: 1 },
+  //   { url: "/models/brainrot/bombardiro.glb", scale: 0.5 },
+  //   { url: "/models/brainrot/patapim.glb", scale: 0.1 },
+  //   { url: "/models/brainrot/sahur.glb", scale: 0.2 },
+  //   { url: "/models/brainrot/tralala.glb", scale: 0.2 },
+  // ],
   modelConfigs = [
-    { url: "/models/brainrot/ambalabu.glb", scale: 1 },
-    { url: "/models/brainrot/bananini.glb", scale: 1 },
-    { url: "/models/brainrot/bombardiro.glb", scale: 0.5 },
-    { url: "/models/brainrot/patapim.glb", scale: 0.1 },
-    { url: "/models/brainrot/sahur.glb", scale: 0.2 },
-    { url: "/models/brainrot/tralala.glb", scale: 0.2 },
+    { url: "/models/frog.glb", scale: 10 },
+    { url: "/models/maximelbv-logo.glb", scale: 2 },
   ],
   instanceCount = 40,
   backgroundColor = "#f1f1f1",
   hdriUrl = "/hdri/photostudio.exr",
   hdriIntensity = 0.4,
-}) => {
+}: SceneProps) => {
   useEffect(() => {
     modelConfigs.forEach((config) => {
       if (config.url) {

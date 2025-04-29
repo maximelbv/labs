@@ -60,8 +60,8 @@ const Clump = () => {
       >
         <sphereGeometry args={[1, 64, 64]} />
         <meshStandardMaterial
-          color={"white"}
-          roughness={0}
+          color={"lightgreen"}
+          roughness={0.4}
           envMapIntensity={1}
         />
       </instancedMesh>
@@ -115,7 +115,6 @@ const Scene = () => {
       camera={{ position: [0, 0, 30], fov: 35 }}
     >
       <ambientLight intensity={0.5} />
-      <color attach="background" args={["#dfdfdf"]} />
       <spotLight
         intensity={1}
         angle={0.2}
@@ -124,12 +123,11 @@ const Scene = () => {
         castShadow
         shadow-mapSize={[512, 512]}
       />
-      {/* <Environment files="/hdri/adamsbridge.hdr" environmentIntensity={1} /> */}
-      <Environment preset="sunset" />
+      <Environment files="/hdri/adamsbridge.hdr" environmentIntensity={1} />
       <EffectComposer multisampling={0}>
         <N8AO
           halfRes
-          color="black"
+          color="#dfdfdf"
           aoRadius={2}
           intensity={1}
           aoSamples={6}

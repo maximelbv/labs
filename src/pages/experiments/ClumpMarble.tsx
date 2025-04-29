@@ -139,15 +139,16 @@ const Scene = () => {
       style={{ cursor: "none" }}
       camera={{ position: [0, 0, 30], fov: 35 }}
     >
-      {/* <ambientLight intensity={0.5} />
-      <directionalLight
-        position={[5, 5, 5]}
-        intensity={1.5}
+      <ambientLight intensity={0.5} />
+      <spotLight
+        intensity={1}
+        angle={0.2}
+        penumbra={1}
+        position={[30, 30, 30]}
         castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-bias={-0.0001}
-      /> */}
-      <Environment files="/hdri/photostudio.exr" environmentIntensity={0.5} />
+        shadow-mapSize={[512, 512]}
+      />
+      <Environment files="/hdri/photostudio.exr" environmentIntensity={0.7} />
       <EffectComposer multisampling={0}>
         <N8AO
           halfRes

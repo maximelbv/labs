@@ -1,5 +1,6 @@
 export const mapExperimentFileNameToUrl = (filename: string): string => {
   return filename
+    .replace("../pages/experiments/", "")
     .replace("./pages/experiments/", "")
     .replace(".tsx", "")
     .replace(".jsx", "")

@@ -18,7 +18,6 @@ const generateExperimentRoutes = () => {
   return Object.entries(experimentModules).map(([path, importModule]) => {
     const routeName = mapExperimentFileNameToUrl(path);
     const Component = lazy(importModule);
-    console.log(routeName);
     return (
       <Route
         key={routeName}

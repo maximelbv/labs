@@ -1,7 +1,6 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   Physics,
-  InstancedRigidBodies,
   RigidBody,
   type RapierRigidBody,
   BallCollider,
@@ -10,68 +9,73 @@ import { useEffect, useMemo, useRef } from "react";
 import { Environment, Sphere } from "@react-three/drei";
 import { MathUtils, Vector3 } from "three";
 import { EffectComposer, N8AO, SMAA } from "@react-three/postprocessing";
+import type { ReactNode } from "react";
 
 const vec3 = (x = 0, y = 0, z = 0): [number, number, number] => [x, y, z];
 
-const Clump = () => {
-  const rigidBodiesRef = useRef<RapierRigidBody[]>(null);
+type ClumpProps = {
+  meshes: ReactNode[];
+  count: number;
+};
+
+const Clump = ({ meshes = [], count = 40 }: ClumpProps) => {
+  const rigidBodiesRef = useRef<RapierRigidBody[] | null>(null);
 
   const instances = useMemo(() => {
-    return Array.from({ length: 40 }, () => ({
-      key: Math.random(),
+    return Array.from({ length: count }, () => ({
+      meshIndex: Math.floor(Math.random() * meshes.length),
       position: vec3(
         MathUtils.randFloatSpread(1),
         MathUtils.randFloatSpread(1),
         MathUtils.randFloatSpread(1)
       ),
-      rotation: vec3(0, 0, 0),
+      rotation: vec3(
+        Math.random() * Math.PI * 2,
+        Math.random() * Math.PI * 2,
+        Math.random() * Math.PI * 2
+      ),
       scale: vec3(1, 1, 1),
     }));
-  }, []);
+  }, [count, meshes.length]);
 
   useFrame(() => {
     if (!rigidBodiesRef.current) return;
     rigidBodiesRef.current.forEach((body) => {
-      const position = body.translation();
-      const force = new Vector3(
-        -position.x,
-        -position.y,
-        -position.z
-      ).multiplyScalar(0.5);
+      if (!body) return;
+      const pos = body.translation();
+      const force = new Vector3(-pos.x, -pos.y, -pos.z)
+        .normalize()
+        .multiplyScalar(2);
       body.applyImpulse({ x: force.x, y: force.y, z: force.z }, true);
     });
   });
 
   return (
-    <InstancedRigidBodies
-      ref={rigidBodiesRef}
-      instances={instances}
-      linearDamping={4}
-      angularDamping={10}
-      colliders="ball"
-    >
-      <instancedMesh
-        args={[undefined, undefined, 40]}
-        castShadow
-        receiveShadow
-        onUpdate={(self) => {
-          self.geometry.setAttribute("uv2", self.geometry.attributes.uv);
-        }}
-      >
-        <sphereGeometry args={[1, 64, 64]} />
-        <meshStandardMaterial
-          color={"lightgreen"}
-          roughness={0.4}
-          envMapIntensity={1}
-        />
-      </instancedMesh>
-    </InstancedRigidBodies>
+    <>
+      {instances.map((instance, i) => (
+        <RigidBody
+          key={i}
+          position={instance.position}
+          rotation={instance.rotation}
+          linearDamping={4}
+          angularDamping={10}
+          colliders="hull"
+          ref={(el) => {
+            if (!el) return;
+            if (!rigidBodiesRef.current) rigidBodiesRef.current = [];
+            rigidBodiesRef.current[i] = el;
+          }}
+        >
+          <group scale={instance.scale}>{meshes[instance.meshIndex]}</group>
+        </RigidBody>
+      ))}
+    </>
   );
 };
 
 const Pointer = () => {
   const { viewport } = useThree();
-  const ref = useRef<RapierRigidBody>(null);
+  const ref = useRef<RapierRigidBody | null>(null);
   const ready = useRef(false);
 
   useEffect(() => {
@@ -108,13 +112,36 @@ const Pointer = () => {
   );
 };
 
-const Scene = () => {
+type SceneProps = {
+  meshes?: ReactNode[];
+  instanceCount?: number;
+  backgroundColor?: string;
+};
+
+const Scene = ({
+  meshes = [
+    <Sphere args={[1]} key="sphere">
+      <meshStandardMaterial color="lightgreen" />
+    </Sphere>,
+    <mesh key="box">
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="lightblue" />
+    </mesh>,
+    <mesh key="torus">
+      <torusGeometry args={[1, 0.4, 16, 32]} />
+      <meshStandardMaterial color="pink" />
+    </mesh>,
+  ],
+  instanceCount = 40,
+  backgroundColor = "#fafafa",
+}: SceneProps) => {
   return (
     <Canvas
-      style={{ cursor: "none" }}
+      style={{ cursor: "none", background: backgroundColor }}
       camera={{ position: [0, 0, 30], fov: 35 }}
     >
       <ambientLight intensity={0.5} />
+      <color attach="background" args={[backgroundColor]} />
       <spotLight
         intensity={1}
         angle={0.2}
@@ -123,21 +150,24 @@ const Scene = () => {
         castShadow
         shadow-mapSize={[512, 512]}
       />
-      <Environment files="/hdri/adamsbridge.hdr" environmentIntensity={1} />
+      <Environment
+        background={false}
+        files={"/hdri/photostudio.exr"}
+        environmentIntensity={0.5}
+      />
       <EffectComposer multisampling={0}>
         <N8AO
           halfRes
-          color="#dfdfdf"
+          color={backgroundColor}
           aoRadius={2}
           intensity={1}
           aoSamples={6}
           denoiseSamples={4}
         />
-        {/* <Bloom mipmapBlur levels={7} intensity={1} /> */}
         <SMAA />
       </EffectComposer>
       <Physics gravity={[0, 1, 0]}>
-        <Clump />
+        <Clump meshes={meshes} count={instanceCount} />
         <Pointer />
       </Physics>
     </Canvas>
@@ -145,22 +175,3 @@ const Scene = () => {
 };
 
 export default Scene;
-
-// custom light
-// model (model rendu)
-// nombre d'objets
-// taille des objets
-// default position distance (valeurs des MathUtils.randFloatSpread dans le clump)
-// force d'attraction (multiplyScalar(0.5))
-// linearDamping
-// angularDamping
-// Collisions: (note: pour une collision representative du mesh,
-// vous pouvez utiliser hull ou trimesh pour une collision plus precise, mais plus performante)
-// curseur custom (true / false)
-// portée de la collision du pointer
-// camera props
-// gravity props
-// background color
-// hdriUrl
-// hdriIntensity
-// style

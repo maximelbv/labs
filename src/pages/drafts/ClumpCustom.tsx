@@ -166,9 +166,9 @@ const Pointer = () => {
 
 const Scene = ({
   modelUrl = "/models/maximelbv-logo.glb",
-  instanceCount = 80,
+  instanceCount = 40,
   modelScale = 3,
-  backgroundColor = "black",
+  backgroundColor = "#fff",
   hdriUrl = "/hdri/photostudio.exr",
   hdriIntensity = 0.4,
 }) => {

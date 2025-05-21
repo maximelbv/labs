@@ -221,7 +221,7 @@ const Scene = ({
   // ],
   modelConfigs = [
     { url: "/models/frog.glb", scale: 10 },
-    { url: "/models/maximelbv-logo.glb", scale: 2 },
+    // { url: "/models/maximelbv-logo.glb", scale: 2 },
   ],
   instanceCount = 40,
   backgroundColor = "#f1f1f1",

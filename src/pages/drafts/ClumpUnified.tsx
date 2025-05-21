@@ -7,7 +7,7 @@ import {
 } from "@react-three/rapier";
 import { useRef, useMemo, useEffect, type ReactNode } from "react";
 import { Environment, useGLTF, Sphere, Clone } from "@react-three/drei";
-import { Vector3, MathUtils, Mesh, Object3D } from "three";
+import { Vector3, MathUtils } from "three";
 import { EffectComposer, N8AO, SMAA } from "@react-three/postprocessing";
 import type { Vector3Tuple } from "three";
 

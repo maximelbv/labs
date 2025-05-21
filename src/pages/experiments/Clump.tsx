@@ -5,7 +5,7 @@ import {
   type RapierRigidBody,
   BallCollider,
 } from "@react-three/rapier";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Environment, Sphere } from "@react-three/drei";
 import { MathUtils, Vector3 } from "three";
 import { EffectComposer, N8AO, SMAA } from "@react-three/postprocessing";
@@ -74,36 +74,43 @@ const Clump = ({ meshes = [], count = 40 }: ClumpProps) => {
 };
 
 const Pointer = () => {
-  const { viewport } = useThree();
-  const ref = useRef<RapierRigidBody | null>(null);
-  const ready = useRef(false);
+  const { viewport, pointer } = useThree();
+  const ref = useRef<RapierRigidBody>(null);
+  const [isReady, setIsReady] = useState(false);
+  const firstPositionRef = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
-    const move = (e: MouseEvent) => {
-      if (!ref.current) return;
-      const x =
-        (((e.clientX / window.innerWidth) * 2 - 1) * viewport.width) / 2;
-      const y =
-        ((-(e.clientY / window.innerHeight) * 2 + 1) * viewport.height) / 2;
-      ref.current.setTranslation({ x, y, z: 0 }, true);
-      ready.current = true;
-      window.removeEventListener("mousemove", move);
+    const handler = () => {
+      if (!firstPositionRef.current) {
+        firstPositionRef.current = {
+          x: (pointer.x * viewport.width) / 2,
+          y: (pointer.y * viewport.height) / 2,
+        };
+        setIsReady(true);
+      }
     };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, [viewport]);
 
-  useFrame(({ pointer }) => {
-    if (!ref.current || !ready.current) return;
-    ref.current.setNextKinematicTranslation({
-      x: (pointer.x * viewport.width) / 2,
-      y: (pointer.y * viewport.height) / 2,
-      z: 0,
-    });
+    window.addEventListener("mousemove", handler, { once: true });
+    return () => window.removeEventListener("mousemove", handler);
+  }, [viewport, pointer]);
+
+  useFrame(() => {
+    if (!ref.current || !isReady) return;
+
+    const x = (pointer.x * viewport.width) / 2;
+    const y = (pointer.y * viewport.height) / 2;
+    ref.current.setNextKinematicTranslation({ x, y, z: 0 });
   });
 
+  if (!isReady || !firstPositionRef.current) return null;
+
   return (
-    <RigidBody type="kinematicPosition" ref={ref} colliders={false}>
+    <RigidBody
+      type="kinematicPosition"
+      position={[firstPositionRef.current.x, firstPositionRef.current.y, 0]}
+      colliders={false}
+      ref={ref}
+    >
       <Sphere scale={0.2}>
         <meshBasicMaterial color={[4, 4, 4]} toneMapped={false} />
       </Sphere>

@@ -1,4 +1,4 @@
-import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   Physics,
   RigidBody,
@@ -6,16 +6,23 @@ import {
   BallCollider,
 } from "@react-three/rapier";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Sphere } from "@react-three/drei";
-import { MathUtils, TextureLoader, Vector3 } from "three";
-import { EffectComposer, SMAA } from "@react-three/postprocessing";
+import { Environment, Sphere } from "@react-three/drei";
+import { MathUtils, Vector3 } from "three";
+import { EffectComposer, N8AO } from "@react-three/postprocessing";
 import type { ReactNode } from "react";
+import { useControls } from "leva";
 
 const vec3 = (x = 0, y = 0, z = 0): [number, number, number] => [x, y, z];
 
 type ClumpProps = {
   meshes: ReactNode[];
   count: number;
+};
+
+type SceneProps = {
+  meshes?: ReactNode[];
+  instanceCount?: number;
+  backgroundColor?: string;
 };
 
 const Clump = ({ meshes = [], count = 40 }: ClumpProps) => {
@@ -45,7 +52,7 @@ const Clump = ({ meshes = [], count = 40 }: ClumpProps) => {
       const pos = body.translation();
       const force = new Vector3(-pos.x, -pos.y, -pos.z)
         .normalize()
-        .multiplyScalar(2);
+        .multiplyScalar(6);
       body.applyImpulse({ x: force.x, y: force.y, z: force.z }, true);
     });
   });
@@ -112,95 +119,48 @@ const Pointer = () => {
       ref={ref}
     >
       <Sphere scale={0.2}>
-        <meshBasicMaterial color={[4, 4, 4]} toneMapped={false} />
+        <meshBasicMaterial color={"black"} toneMapped={false} />
       </Sphere>
       <BallCollider args={[2]} restitution={0.1} />
     </RigidBody>
   );
 };
 
-type SceneProps = {
-  meshes?: ReactNode[];
-  instanceCount?: number;
-  backgroundColor?: string;
-};
-
-const Scene = ({
-  instanceCount = 40,
-  backgroundColor = "#fff",
-}: SceneProps) => {
-  const overlay = useLoader(TextureLoader, "/textures/smile.png");
+const Scene = ({ backgroundColor = "#fff" }: SceneProps) => {
   const meshes = [
-    <group key="sphere-1">
-      <Sphere args={[1]}>
-        <meshToonMaterial
-          color="#8aff68"
-          gradientMap={null}
-          toneMapped={false}
-        />
-      </Sphere>
-      <Sphere args={[1.001]}>
-        <meshBasicMaterial map={overlay} transparent depthWrite={false} />
-      </Sphere>
-    </group>,
-
-    <group key="sphere-2">
-      <Sphere args={[1]}>
-        <meshToonMaterial
-          color="#68c5ff"
-          gradientMap={null}
-          toneMapped={false}
-        />
-      </Sphere>
-      <Sphere args={[1.001]}>
-        <meshBasicMaterial map={overlay} transparent depthWrite={false} />
-      </Sphere>
-    </group>,
-
-    <group key="sphere-3">
-      <Sphere args={[1]}>
-        <meshToonMaterial
-          color="#be88ff"
-          gradientMap={null}
-          toneMapped={false}
-        />
-      </Sphere>
-      <Sphere args={[1.001]}>
-        <meshBasicMaterial map={overlay} transparent depthWrite={false} />
-      </Sphere>
-    </group>,
+    <Sphere args={[1]} key="sphere-1">
+      <meshLambertMaterial color="#ffa0a0" emissive="red" />
+    </Sphere>,
   ];
+  const { instances } = useControls({
+    instances: { value: 40, min: 1, max: 500 },
+  });
 
   return (
     <Canvas
       style={{ cursor: "none", background: backgroundColor }}
-      camera={{ position: [0, 0, 30], fov: 35 }}
+      camera={{ position: [0, 0, 30], fov: 40 }}
       shadows
+      gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
+      onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}
     >
       <color attach="background" args={[backgroundColor]} />
-      <ambientLight intensity={1.2} />
-      <directionalLight
-        position={[10, 15, 10]}
-        intensity={1.5}
+      <ambientLight intensity={1} />
+      <spotLight
+        position={[20, 20, 25]}
+        penumbra={1}
+        angle={0.2}
+        color="white"
         castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-bias={-0.0001}
+        shadow-mapSize={[512, 512]}
       />
-      <directionalLight
-        position={[-10, 5, 10]}
-        intensity={0.6}
-        color="#c0d9ff"
-      />
-      <directionalLight
-        position={[0, -10, -10]}
-        intensity={0.4}
-        color="#ffffff"
-      />
+      <directionalLight position={[0, 5, -4]} intensity={4} />
+      <Environment files="/hdri/adamsbridge.hdr" />
       <EffectComposer>
-        <SMAA />
+        <N8AO color="black" aoRadius={2} intensity={1.15} />
       </EffectComposer>
       <Physics gravity={[0, 1, 0]}>
-        <Clump meshes={meshes} count={instanceCount} />
+        <Clump meshes={meshes} count={instances} />
         <Pointer />
       </Physics>
     </Canvas>

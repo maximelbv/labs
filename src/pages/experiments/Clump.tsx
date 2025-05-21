@@ -134,17 +134,25 @@ const Pointer = () => {
 };
 
 const Scene = ({ backgroundColor = "#fff" }: SceneProps) => {
-  const { instanceCount, force, shape, color, emissive } = useControls({
-    instanceCount: { value: 40, min: 1, max: 200, step: 1 },
+  const controls = useControls({
+    instanceCount: { value: 40, min: 40, max: 200, step: 1 },
     force: { value: 1, min: 0, max: 5 },
     shape: { options: ["sphere", "box", "torus"] },
     color: "#40b0ff",
     emissive: "#87b3ff",
   });
 
+  const [clampedCount, setClampedCount] = useState(controls.instanceCount);
+
+  useEffect(() => {
+    if (controls.instanceCount > clampedCount) {
+      setClampedCount(controls.instanceCount);
+    }
+  }, [controls.instanceCount, clampedCount]);
+
   const mesh = useMemo(
-    () => getMesh(shape, color, emissive),
-    [shape, color, emissive]
+    () => getMesh(controls.shape, controls.color, controls.emissive),
+    [controls.shape, controls.color, controls.emissive]
   );
 
   return (
@@ -172,7 +180,7 @@ const Scene = ({ backgroundColor = "#fff" }: SceneProps) => {
         <N8AO color="black" aoRadius={2} intensity={1.15} />
       </EffectComposer>
       <Physics gravity={[0, 1, 0]}>
-        <Clump mesh={mesh} count={instanceCount} force={force} />
+        <Clump mesh={mesh} count={clampedCount} force={controls.force} />
         <Pointer />
       </Physics>
     </Canvas>

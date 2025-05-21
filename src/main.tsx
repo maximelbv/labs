@@ -10,10 +10,6 @@ const experimentModules = import.meta.glob(
   "./pages/experiments/**/*.{tsx,jsx}"
 ) as Record<string, () => Promise<{ default: ComponentType<unknown> }>>;
 
-// const preloadExperiments = () => {
-//   Object.values(experimentModules).forEach((importModule) => importModule());
-// };
-
 const generateExperimentRoutes = () => {
   return Object.entries(experimentModules).map(([path, importModule]) => {
     const routeName = mapExperimentFileNameToUrl(path);
@@ -24,9 +20,7 @@ const generateExperimentRoutes = () => {
         path={`/${routeName}`}
         element={
           <Suspense fallback={null}>
-            <MainLayout>
-              <Component />
-            </MainLayout>
+            <Component />
           </Suspense>
         }
       />
@@ -35,23 +29,14 @@ const generateExperimentRoutes = () => {
 };
 
 const RootApp = () => {
-  // useEffect(() => {
-  //   preloadExperiments();
-  // }, []);
-
   return (
     <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <MainLayout>
-              <App />
-            </MainLayout>
-          }
-        />
-        {generateExperimentRoutes()}
-      </Routes>
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<App />} />
+          {generateExperimentRoutes()}
+        </Routes>
+      </MainLayout>
     </BrowserRouter>
   );
 };

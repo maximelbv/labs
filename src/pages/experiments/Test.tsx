@@ -4,7 +4,7 @@ import SceneRenderingSetup from "../../components/renderings/ClassicRenderingSet
 import { useControls } from "leva";
 
 const TestScene = () => {
-  const { scene } = useGLTF("/public/models/test.glb");
+  const { scene } = useGLTF("/models/test.glb");
   const { setup } = useControls({
     setup: true,
   });

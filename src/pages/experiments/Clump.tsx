@@ -1,4 +1,4 @@
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import {
   Physics,
   RigidBody,
@@ -6,9 +6,9 @@ import {
   BallCollider,
 } from "@react-three/rapier";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Environment, Sphere } from "@react-three/drei";
-import { MathUtils, Vector3 } from "three";
-import { EffectComposer, N8AO, SMAA } from "@react-three/postprocessing";
+import { Sphere } from "@react-three/drei";
+import { MathUtils, TextureLoader, Vector3 } from "three";
+import { EffectComposer, SMAA } from "@react-three/postprocessing";
 import type { ReactNode } from "react";
 
 const vec3 = (x = 0, y = 0, z = 0): [number, number, number] => [x, y, z];
@@ -59,7 +59,7 @@ const Clump = ({ meshes = [], count = 40 }: ClumpProps) => {
           rotation={instance.rotation}
           linearDamping={4}
           angularDamping={10}
-          colliders="hull"
+          colliders="ball"
           ref={(el) => {
             if (!el) return;
             if (!rigidBodiesRef.current) rigidBodiesRef.current = [];
@@ -126,51 +126,77 @@ type SceneProps = {
 };
 
 const Scene = ({
-  meshes = [
-    <Sphere args={[1]} key="sphere">
-      <meshStandardMaterial color="lightgreen" />
-    </Sphere>,
-    <mesh key="box">
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="lightblue" />
-    </mesh>,
-    <mesh key="torus">
-      <torusGeometry args={[1, 0.4, 16, 32]} />
-      <meshStandardMaterial color="pink" />
-    </mesh>,
-  ],
   instanceCount = 40,
-  backgroundColor = "#fafafa",
+  backgroundColor = "#fff",
 }: SceneProps) => {
+  const overlay = useLoader(TextureLoader, "/textures/smile.png");
+  const meshes = [
+    <group key="sphere-1">
+      <Sphere args={[1]}>
+        <meshToonMaterial
+          color="#8aff68"
+          gradientMap={null}
+          toneMapped={false}
+        />
+      </Sphere>
+      <Sphere args={[1.001]}>
+        <meshBasicMaterial map={overlay} transparent depthWrite={false} />
+      </Sphere>
+    </group>,
+
+    <group key="sphere-2">
+      <Sphere args={[1]}>
+        <meshToonMaterial
+          color="#68c5ff"
+          gradientMap={null}
+          toneMapped={false}
+        />
+      </Sphere>
+      <Sphere args={[1.001]}>
+        <meshBasicMaterial map={overlay} transparent depthWrite={false} />
+      </Sphere>
+    </group>,
+
+    <group key="sphere-3">
+      <Sphere args={[1]}>
+        <meshToonMaterial
+          color="#be88ff"
+          gradientMap={null}
+          toneMapped={false}
+        />
+      </Sphere>
+      <Sphere args={[1.001]}>
+        <meshBasicMaterial map={overlay} transparent depthWrite={false} />
+      </Sphere>
+    </group>,
+  ];
+
   return (
     <Canvas
       style={{ cursor: "none", background: backgroundColor }}
       camera={{ position: [0, 0, 30], fov: 35 }}
+      shadows
     >
-      <ambientLight intensity={0.5} />
       <color attach="background" args={[backgroundColor]} />
-      <spotLight
-        intensity={1}
-        angle={0.2}
-        penumbra={1}
-        position={[30, 30, 30]}
+      <ambientLight intensity={1.2} />
+      <directionalLight
+        position={[10, 15, 10]}
+        intensity={1.5}
         castShadow
-        shadow-mapSize={[512, 512]}
+        shadow-mapSize={[1024, 1024]}
+        shadow-bias={-0.0001}
       />
-      <Environment
-        background={false}
-        files={"/hdri/photostudio.exr"}
-        environmentIntensity={0.5}
+      <directionalLight
+        position={[-10, 5, 10]}
+        intensity={0.6}
+        color="#c0d9ff"
       />
-      <EffectComposer multisampling={0}>
-        <N8AO
-          halfRes
-          color={backgroundColor}
-          aoRadius={2}
-          intensity={1}
-          aoSamples={6}
-          denoiseSamples={4}
-        />
+      <directionalLight
+        position={[0, -10, -10]}
+        intensity={0.4}
+        color="#ffffff"
+      />
+      <EffectComposer>
         <SMAA />
       </EffectComposer>
       <Physics gravity={[0, 1, 0]}>

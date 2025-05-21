@@ -103,44 +103,36 @@ const Clump = ({
 const Pointer = () => {
   const { viewport, pointer } = useThree();
   const ref = useRef<RapierRigidBody>(null);
-  const [isReady, setIsReady] = useState(false);
-  const firstPositionRef = useRef<{ x: number; y: number } | null>(null);
-
-  useEffect(() => {
-    const handler = () => {
-      if (!firstPositionRef.current) {
-        firstPositionRef.current = {
-          x: (pointer.x * viewport.width) / 2,
-          y: (pointer.y * viewport.height) / 2,
-        };
-        setIsReady(true);
-      }
-    };
-
-    window.addEventListener("mousemove", handler, { once: true });
-    return () => window.removeEventListener("mousemove", handler);
-  }, [viewport, pointer]);
+  const [colliderEnabled, setColliderEnabled] = useState(false);
+  const hasEntered = useRef(false);
 
   useFrame(() => {
-    if (!ref.current || !isReady) return;
+    if (!ref.current) return;
+
     const x = (pointer.x * viewport.width) / 2;
     const y = (pointer.y * viewport.height) / 2;
+
+    if (x === 0 && y === 0) return;
+
+    if (!hasEntered.current) {
+      hasEntered.current = true;
+      setTimeout(() => setColliderEnabled(true), 0);
+    }
+
     ref.current.setNextKinematicTranslation({ x, y, z: 0 });
   });
-
-  if (!isReady || !firstPositionRef.current) return null;
 
   return (
     <RigidBody
       type="kinematicPosition"
-      position={[firstPositionRef.current.x, firstPositionRef.current.y, 0]}
       colliders={false}
+      position={[viewport.width / 2, viewport.height / 2, 0]}
       ref={ref}
     >
       <Sphere scale={0.2}>
         <meshBasicMaterial color="black" toneMapped={false} />
       </Sphere>
-      <BallCollider args={[2]} restitution={0.1} />
+      {colliderEnabled && <BallCollider args={[2]} restitution={0.1} />}
     </RigidBody>
   );
 };

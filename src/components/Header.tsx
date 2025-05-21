@@ -10,17 +10,43 @@ const experimentModules = import.meta.glob(
   "../pages/experiments/**/*.{tsx,jsx}"
 );
 
+type ExperimentMeta = {
+  slug: string;
+  title: string;
+  category: string;
+  cover: string;
+};
+
+type ExperimentModule = {
+  default: unknown;
+  meta?: ExperimentMeta;
+};
+
 const Header = ({ className }: { className?: string }) => {
-  const [experiments, setExperiments] = useState<string[]>([]);
+  const [experiments, setExperiments] = useState<ExperimentMeta[]>([]);
   const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(true);
 
   useEffect(() => {
-    const routes = Object.keys(experimentModules).map(
-      mapExperimentFileNameToUrl
-    );
+    const load = async () => {
+      const entries = await Promise.all(
+        Object.entries(experimentModules).map(async ([path, loader]) => {
+          const mod = (await loader()) as ExperimentModule;
+          const slug = mapExperimentFileNameToUrl(path);
+          const meta = mod.meta ?? {
+            title: slug,
+            category: "Uncategorized",
+            cover: `${slug}.jpg`,
+          };
+          return {
+            slug,
+            ...meta,
+          };
+        })
+      );
+      setExperiments(entries);
+    };
 
-    setExperiments(routes);
-    console.log(routes);
+    load();
   }, []);
 
   const handleCloseDrawer = () => {
@@ -50,7 +76,7 @@ const Header = ({ className }: { className?: string }) => {
       <div className="overflow-y-auto">
         <div className="flex-1 p-4 pt-0 flex flex-col gap-4">
           {experiments.map((exp) => (
-            <ExperimentCard exp={exp} key={exp} />
+            <ExperimentCard key={exp.slug} {...exp} />
           ))}
         </div>
       </div>

@@ -1,23 +1,29 @@
 import { Link } from "react-router";
 
-interface ExperimentCardProps {
-  exp: string;
-}
+type ExperimentCardProps = {
+  slug: string;
+  title: string;
+  category: string;
+  cover: string;
+};
 
-const ExperimentCard = ({ exp }: ExperimentCardProps) => {
+const ExperimentCard = ({
+  slug,
+  title,
+  category,
+  cover,
+}: ExperimentCardProps) => {
   return (
-    <Link
-      key={exp}
-      to={`/${exp}`}
-      className="group relative flex items-center border border-border-light justify-center rounded-xl bg-white aspect-video overflow-hidden"
-    >
-      {/* <div className="group-hover:top-0 text-lg absolute top-[-100%] left-0 w-full px-4 py-3 border-b border-border-light flex justify-between items-center font-jetbrains transition-all ease-[cubic-bezier(.4,.38,.12,.99)] duration-600">
-        {exp}
-        <span className="text-text-muted-light">
-          #{index.toString().padStart(3, "0")}
+    <Link key={title} to={`/${slug}`}>
+      <div className="group relative flex items-center border border-border-light justify-center rounded-xl bg-white aspect-video overflow-hidden">
+        <img src={cover} />
+      </div>
+      <div className="flex flex-col">
+        <span className="text-text-muted">{category}</span>
+        <span className="font-bold text-2xl text-text-primary leading-6">
+          {title}
         </span>
-      </div> */}
-      {exp}
+      </div>
     </Link>
   );
 };

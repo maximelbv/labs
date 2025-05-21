@@ -176,4 +176,10 @@ const Scene = ({ backgroundColor = "#fff" }: SceneProps) => {
   );
 };
 
+export const meta = {
+  title: "Magnetic Clump",
+  category: "Three.js",
+  cover: "experimentsPreviews/clump.png",
+};
+
 export default Scene;

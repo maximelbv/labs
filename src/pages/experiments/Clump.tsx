@@ -26,7 +26,7 @@ type SceneProps = {
 };
 
 const Clump = ({ meshes = [], count = 40 }: ClumpProps) => {
-  const rigidBodiesRef = useRef<RapierRigidBody[] | null>(null);
+  const rigidBodiesRef = useRef<RapierRigidBody[]>([]);
 
   const instances = useMemo(() => {
     return Array.from({ length: count }, () => ({
@@ -68,9 +68,7 @@ const Clump = ({ meshes = [], count = 40 }: ClumpProps) => {
           angularDamping={10}
           colliders="ball"
           ref={(el) => {
-            if (!el) return;
-            if (!rigidBodiesRef.current) rigidBodiesRef.current = [];
-            rigidBodiesRef.current[i] = el;
+            if (el) rigidBodiesRef.current[i] = el;
           }}
         >
           <group scale={instance.scale}>{meshes[instance.meshIndex]}</group>

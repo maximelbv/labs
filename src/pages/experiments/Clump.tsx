@@ -42,21 +42,33 @@ const Clump = ({
   force: number;
 }) => {
   const rigidBodiesRef = useRef<RapierRigidBody[]>([]);
+  const [instances, setInstances] = useState<
+    {
+      position: [number, number, number];
+      rotation: [number, number, number];
+      scale: [number, number, number];
+    }[]
+  >([]);
 
-  const instances = useMemo(() => {
-    return Array.from({ length: count }, () => ({
-      position: vec3(
-        MathUtils.randFloatSpread(1),
-        MathUtils.randFloatSpread(1),
-        MathUtils.randFloatSpread(1)
-      ),
-      rotation: vec3(
-        Math.random() * Math.PI * 2,
-        Math.random() * Math.PI * 2,
-        Math.random() * Math.PI * 2
-      ),
-      scale: vec3(1, 1, 1),
-    }));
+  useEffect(() => {
+    setInstances((prev) => {
+      if (count <= prev.length) return prev;
+      const toAdd = count - prev.length;
+      const newInstances = Array.from({ length: toAdd }, () => ({
+        position: vec3(
+          MathUtils.randFloatSpread(1),
+          MathUtils.randFloatSpread(1),
+          MathUtils.randFloatSpread(1)
+        ),
+        rotation: vec3(
+          Math.random() * Math.PI * 2,
+          Math.random() * Math.PI * 2,
+          Math.random() * Math.PI * 2
+        ),
+        scale: vec3(1, 1, 1),
+      }));
+      return [...prev, ...newInstances];
+    });
   }, [count]);
 
   useFrame(() => {
@@ -135,7 +147,7 @@ const Pointer = () => {
 
 const Scene = ({ backgroundColor = "#fff" }: SceneProps) => {
   const controls = useControls({
-    instanceCount: { value: 40, min: 40, max: 200, step: 1 },
+    instanceCount: { value: 40, min: 40, max: 300, step: 1 },
     force: { value: 1, min: 0, max: 5 },
     shape: { options: ["sphere", "box", "torus"] },
     color: "#40b0ff",

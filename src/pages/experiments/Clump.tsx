@@ -6,11 +6,11 @@ import {
   BallCollider,
 } from "@react-three/rapier";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Environment, Sphere, Box, Torus } from "@react-three/drei";
+import { Sphere, Box, Torus } from "@react-three/drei";
 import { MathUtils, Vector3 } from "three";
-import { EffectComposer, N8AO } from "@react-three/postprocessing";
 import { useControls } from "leva";
 import type { ReactNode } from "react";
+import ClassicRenderingSetup from "../../components/renderings/ClassicRenderingSetup";
 
 const vec3 = (x = 0, y = 0, z = 0): [number, number, number] => [x, y, z];
 
@@ -175,22 +175,7 @@ const Scene = ({ backgroundColor = "#fff" }: SceneProps) => {
       gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
       onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}
     >
-      <color attach="background" args={[backgroundColor]} />
-      <ambientLight intensity={1} />
-      <spotLight
-        position={[20, 20, 25]}
-        penumbra={1}
-        angle={0.2}
-        color="white"
-        castShadow
-        shadow-mapSize={[512, 512]}
-        intensity={2}
-      />
-      <directionalLight position={[0, 5, -4]} intensity={4} />
-      <Environment files="/hdri/adamsbridge.hdr" />
-      <EffectComposer>
-        <N8AO color="black" aoRadius={2} intensity={1.15} />
-      </EffectComposer>
+      <ClassicRenderingSetup />
       <Physics gravity={[0, 1, 0]}>
         <Clump mesh={mesh} count={clampedCount} force={controls.force} />
         <Pointer />

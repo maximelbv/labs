@@ -78,7 +78,7 @@ const Clump = ({
           rotation={instance.rotation}
           linearDamping={4}
           angularDamping={10}
-          colliders="ball"
+          colliders="hull"
           ref={(el) => {
             if (el) rigidBodiesRef.current[i] = el;
           }}

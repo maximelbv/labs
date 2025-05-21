@@ -62,9 +62,7 @@ const Clump = ({
   useFrame(() => {
     rigidBodiesRef.current.forEach((body) => {
       const pos = body.translation();
-      const f = new Vector3(-pos.x, -pos.y, -pos.z)
-        .normalize()
-        .multiplyScalar(force);
+      const f = new Vector3(-pos.x, -pos.y, -pos.z).multiplyScalar(force);
       body.applyImpulse({ x: f.x, y: f.y, z: f.z }, true);
     });
   });
@@ -138,7 +136,7 @@ const Pointer = () => {
 const Scene = ({ backgroundColor = "#fff" }: SceneProps) => {
   const { instanceCount, force, shape, color, emissive } = useControls({
     instanceCount: { value: 40, min: 1, max: 200, step: 1 },
-    force: { value: 6, min: 0, max: 20 },
+    force: { value: 1, min: 0, max: 5 },
     shape: { options: ["sphere", "box", "torus"] },
     color: "#40b0ff",
     emissive: "#87b3ff",

@@ -56,24 +56,31 @@ const Header = ({ className }: { className?: string }) => {
 
   return (
     <div
-      className={`transition-all duration-300 ease-in-out flex flex-col justify-start gap-4 h-[100svh] ${
+      className={`relative transition-all duration-300 ease-in-out flex flex-col justify-start gap-4 h-[100svh] ${
         isOpenDrawer ? "w-100" : "w-16"
       } ${className}`}
     >
+      <button
+        className="absolute top-[10px] right-[-30px] z-999 cursor-pointer"
+        onClick={handleCloseDrawer}
+      >
+        {isOpenDrawer ? (
+          <PanelLeftClose className="text-text-muted-light" />
+        ) : (
+          <PanelLeftOpen className="text-text-muted-light" />
+        )}
+      </button>
       <div className="p-4 pb-0 flex justify-between items-start">
         <div className="flex flex-col gap-1 w-100">
           <Link to="/">{isOpenDrawer ? <Logo /> : <LogoMini />}</Link>
         </div>
-        <button className="cursor-pointer" onClick={handleCloseDrawer}>
-          {isOpenDrawer ? <PanelLeftClose /> : <PanelLeftOpen />}
-        </button>
       </div>
 
       <div className="overflow-y-auto">
         <div
           className={`flex-1 ${
-            isOpenDrawer ? "p-4" : "p-1"
-          } pt-0 flex flex-col gap-4`}
+            isOpenDrawer ? "p-4 gap-4" : "p-1 gap-1"
+          } pt-0 flex flex-col`}
         >
           {experiments.map((exp) => (
             <ExperimentCard

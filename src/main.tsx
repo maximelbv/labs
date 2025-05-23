@@ -1,10 +1,10 @@
 import { createRoot } from "react-dom/client";
 import "./globals.css";
-import App from "./App.tsx";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import MainLayout from "./layouts/MainLayout.tsx";
 import { lazy, Suspense, ComponentType } from "react";
 import { mapExperimentFileNameToUrl } from "./helpers/string-helpers.tsx";
+import NotFoundPage from "./pages/NotFoundPage.tsx";
 
 const experimentModules = import.meta.glob(
   "./pages/experiments/**/*.{tsx,jsx}"
@@ -33,7 +33,9 @@ const RootApp = () => {
     <BrowserRouter>
       <MainLayout>
         <Routes>
-          <Route path="/" element={<App />} />
+          <Route path="/" element={<Navigate to="/clump" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
+
           {generateExperimentRoutes()}
         </Routes>
       </MainLayout>

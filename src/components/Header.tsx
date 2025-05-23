@@ -6,6 +6,7 @@ import { mapExperimentFileNameToUrl } from "../helpers/string-helpers";
 import ExperimentCard from "./ExperimentCard";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import LogoMini from "./LogoMini";
+import { getDeviceType } from "../helpers/device-helper";
 
 const experimentModules = import.meta.glob(
   "../pages/experiments/**/*.{tsx,jsx}"
@@ -26,6 +27,7 @@ type ExperimentModule = {
 const Header = ({ className }: { className?: string }) => {
   const [experiments, setExperiments] = useState<ExperimentMeta[]>([]);
   const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(true);
+  const device = getDeviceType();
 
   useEffect(() => {
     const load = async () => {
@@ -36,7 +38,7 @@ const Header = ({ className }: { className?: string }) => {
           const meta = mod.meta ?? {
             title: slug,
             category: "Uncategorized",
-            cover: `${slug}.jpg`,
+            cover: `experimentsPreviews/placeholder.png`,
           };
           return {
             slug,
@@ -49,6 +51,12 @@ const Header = ({ className }: { className?: string }) => {
 
     load();
   }, []);
+
+  useEffect(() => {
+    if (device !== "mouse") {
+      setIsOpenDrawer(false);
+    }
+  }, [device]);
 
   const handleCloseDrawer = () => {
     setIsOpenDrawer(!isOpenDrawer);
@@ -65,9 +73,9 @@ const Header = ({ className }: { className?: string }) => {
         onClick={handleCloseDrawer}
       >
         {isOpenDrawer ? (
-          <PanelLeftClose className="text-text-muted-light" />
+          <PanelLeftClose className="text-text-muted-light hover:text-text-muted transition-all duration-300 ease-in-out" />
         ) : (
-          <PanelLeftOpen className="text-text-muted-light" />
+          <PanelLeftOpen className="text-text-muted-light hover:text-text-muted transition-all duration-300 ease-in-out" />
         )}
       </button>
       <div className="p-4 pb-0 flex justify-between items-start">

@@ -180,6 +180,7 @@ export const meta = {
   title: "Magnetic Clump",
   category: "Three.js",
   cover: "experimentsPreviews/clump.png",
+  date: "2025-05-21",
 };
 
 export default Scene;

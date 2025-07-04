@@ -6,6 +6,7 @@ type ExperimentCardProps = {
   title: string;
   category: string;
   cover: string;
+  date: string;
 };
 
 const ExperimentCard = ({

@@ -17,6 +17,7 @@ type ExperimentMeta = {
   title: string;
   category: string;
   cover: string;
+  date: string;
 };
 
 type ExperimentModule = {
@@ -39,6 +40,7 @@ const Header = ({ className }: { className?: string }) => {
             title: slug,
             category: "Uncategorized",
             cover: `experimentsPreviews/placeholder.png`,
+            date: "",
           };
           return {
             slug,
@@ -46,7 +48,14 @@ const Header = ({ className }: { className?: string }) => {
           };
         })
       );
-      setExperiments(entries);
+
+      const sorted = entries.sort((a, b) => {
+        const dateA = new Date(a.date ?? 0).getTime();
+        const dateB = new Date(b.date ?? 0).getTime();
+        return dateB - dateA;
+      });
+
+      setExperiments(sorted);
     };
 
     load();

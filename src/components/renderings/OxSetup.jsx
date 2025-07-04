@@ -35,13 +35,13 @@ export default function OxSetup({ children }) {
   });
 
   return (
-    <Canvas shadows camera={{ position: [0, 7, 6], fov: 65 }}>
+    <Canvas shadows camera={{ position: [2, 2, 6], fov: 65 }}>
       <group position={[0, 0, 0]}>
         <Float floatIntensity={2}>
           <Center
             scale={3}
-            position={[0, 1, 0]}
-            rotation={[0, Math.PI - Math.PI / 3.5, -0.4]}
+            position={[0, 0.5, 0]}
+            rotation={[0, Math.PI - Math.PI / 10, 0]}
           >
             {children}
           </Center>

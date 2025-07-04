@@ -1,10 +1,10 @@
-import { MotoModel } from "../../components/gltfjsx-models/Moto";
+import { MaximelbvLogoModelV2 } from "../../components/gltfjsx-models/MaximelbvLogoV2";
 import OxSetup from "../../components/renderings/OxSetup";
 
 const BlurredEnv = () => {
   return (
     <OxSetup>
-      <MotoModel />
+      <MaximelbvLogoModelV2 />
     </OxSetup>
   );
 };
